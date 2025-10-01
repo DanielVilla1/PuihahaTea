@@ -1,0 +1,5 @@
+Admin edit
+
+Now I want you to create a dashboard file inside the Views admin folder with the following specifications:
+-Display the contents of the database 
+-It should edit the services.php gallery

@@ -1,0 +1,38 @@
+You're a frontend developer
+
+the client has these specifications:
+A site named PuihahaTea
+topic is all about Tea
+vibes Tropic
+Navigation that have Home, Services, About, and Contact
+provide a proper spacing for readability
+
+-create view
+-use controller Home.php use index function
+-modify landing route to use the correct controller
+
+
+-create css inside controller and called/used by view(optional if you want a separate css file)
+
+
+
+The next deliverables we have is:
+-Create its own file for Services in view
+-Create new function for controller also used by routes
+-I want the design to have a product gallery
+
+
+
+
+The next deliverables we have is:
+-Create its own file for About in view
+-Create new function for controller also used by routes
+-create an about us history
+
+
+
+
+The next deliverables we have is:
+-Create its own file for Contact in view
+-Create new function for controller also used by routes
+-I want the design to be a form base

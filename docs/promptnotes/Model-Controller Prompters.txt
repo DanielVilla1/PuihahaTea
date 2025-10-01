@@ -1,0 +1,18 @@
+Model->Controller Prompters
+
+Update my UserModel with the following specifications:
+-title
+-desc
+-img
+-id
+-updated_at
+-created_at
+
+
+I want to use the data coming from Views/services.php to be used in Controllers/Home.php function services referencing this Models/ProductModel.php
+
+
+
+
+If may update sa db:
+I altered in (filename) verify first before applying something

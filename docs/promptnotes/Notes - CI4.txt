@@ -1,0 +1,4 @@
+change name and ports sa docker - compose.yaml
+cheatsheet to add templates and containers sa docker - readme.md
+dbcode - add lang, ports must be the same as docker container (localhost)
+migration and seed(database) - lecture 2
