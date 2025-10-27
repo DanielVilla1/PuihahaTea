@@ -44,7 +44,7 @@
                     </div>
                     <div class="sm:col-span-1">
                         <label class="block font-medium text-emerald-900/80 text-sm">Phone (optional)</label>
-                        <input type="tel" class="mt-2 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="(+63) 900 000 0000" />
+                        <input type="tel" class="mt-2 border border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="(+63) 900 000 0000" />
                     </div>
                     <div class="sm:col-span-1">
                         <label class="block font-medium text-emerald-900/80 text-sm">Subject</label>
