@@ -102,25 +102,27 @@
 
         <!-- Contact -->
         <section id="contact" class="py-16 sm:py-20 lg:py-24">
-            <h2 class="font-serif text-emerald-900 text-3xl sm:text-4xl">Contact</h2>
+            <h2 class="font-serif text-emerald-900 text-3xl sm:text-4xl">Contact Us</h2>
             <p class="mt-2 max-w-2xl text-emerald-800/80">Let’s plan your next refreshing moment. We’ll get back within 1–2 business days.</p>
-            <form class="gap-4 grid sm:grid-cols-2 mt-8">
-                <div class="sm:col-span-1">
-                    <label class="block font-medium text-emerald-900/80 text-sm">Name</label>
-                    <input type="text" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="Your name" />
-                </div>
-                <div class="sm:col-span-1">
-                    <label class="block font-medium text-emerald-900/80 text-sm">Email</label>
-                    <input type="email" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="you@example.com" />
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block font-medium text-emerald-900/80 text-sm">Message</label>
-                    <textarea rows="4" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="Tell us about your event or idea..."></textarea>
-                </div>
-                <div class="sm:col-span-2">
-                    <button type="button" class="bg-emerald-700 hover:bg-emerald-800 px-5 py-3 rounded-md text-white">Send Message</button>
-                </div>
-            </form>
+            <div class="bg-white shadow-sm mt-8 p-6 sm:p-8 border border-emerald-100 rounded-2xl ring-1 ring-emerald-100">
+                <form class="gap-4 grid sm:grid-cols-2">
+                    <div class="sm:col-span-1">
+                        <label class="block font-medium text-emerald-900/80 text-sm">Name</label>
+                        <input type="text" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="Your name" />
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label class="block font-medium text-emerald-900/80 text-sm">Email</label>
+                        <input type="email" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="you@example.com" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block font-medium text-emerald-900/80 text-sm">Message</label>
+                        <textarea rows="4" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" placeholder="Tell us about your event or idea..."></textarea>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <button type="button" class="bg-emerald-700 hover:bg-emerald-800 px-5 py-3 rounded-md text-white">Send Message</button>
+                    </div>
+                </form>
+            </div>
         </section>
     </main>
 
