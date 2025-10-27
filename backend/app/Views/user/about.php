@@ -42,7 +42,7 @@
                             <p class="mt-2 text-emerald-800/80">On a small tropical island, our founders started blending teas with fruits from the morning market: mango, pineapple, and passionfruit. The first batches were shared with neighbors on warm afternoons.</p>
                         </div>
                         <div class="mt-4 md:mt-0 md:pl-10">
-                            <img src="https://images.unsplash.com/photo-1498654077810-12f73e4a0a1b?q=80&w=1200&auto=format&fit=crop" alt="Tropical island market" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
+                            <img src="https://i.pinimg.com/736x/fb/62/4d/fb624dcaefc878f56fedd95efa0619df.jpg" alt="Tropical island market" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
                         </div>
                     </li>
                     <li class="relative md:gap-12 md:grid md:grid-cols-2">
@@ -51,7 +51,7 @@
                             <p class="mt-2 text-emerald-800/80">We opened a tiny tea bar near the shore, serving cold-brewed tropical blends. Word-of-mouth brought lines of locals and travelers.</p>
                         </div>
                         <div class="md:order-1 mt-4 md:mt-0 md:pl-10">
-                            <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1200&auto=format&fit=crop" alt="Cozy tea bar" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
+                            <img src="https://i.pinimg.com/originals/db/8b/e2/db8be20e871de17052918c56683fb91b.jpg" alt="Cozy tea bar" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
                         </div>
                     </li>
                     <li class="relative md:gap-12 md:grid md:grid-cols-2">
@@ -60,7 +60,7 @@
                             <p class="mt-2 text-emerald-800/80">We brought PuihahaTea to weddings and community events with pop-up bars and hands-on brewing workshops.</p>
                         </div>
                         <div class="mt-4 md:mt-0 md:pl-10">
-                            <img src="https://images.unsplash.com/photo-1532635221-7a6e36819d33?q=80&w=1200&auto=format&fit=crop" alt="Tea workshop" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
+                            <img src="https://i.pinimg.com/736x/ec/78/a4/ec78a483f562cc740754e71a0955842b.jpg" alt="Tea workshop" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
                         </div>
                     </li>
                     <li class="relative md:gap-12 md:grid md:grid-cols-2">
@@ -69,7 +69,7 @@
                             <p class="mt-2 text-emerald-800/80">We continue to craft small-batch blends using responsibly sourced leaves and sun-kissed fruits — delivering a sip of the tropics wherever you are.</p>
                         </div>
                         <div class="md:order-1 mt-4 md:mt-0 md:pl-10">
-                            <img src="https://images.unsplash.com/photo-1526401485004-2fda9f4aff8e?q=80&w=1200&auto=format&fit=crop" alt="Tropical tea glass" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
+                            <img src="https://i.pinimg.com/736x/93/3c/2a/933c2ac5550dd2d4f5cdf03757c803fa.jpg" alt="Tropical tea glass" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
                         </div>
                     </li>
                 </ol>

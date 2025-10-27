@@ -1,99 +1,130 @@
-<?php /* Admin Dashboard: manage products for Services gallery */ ?>
-<!DOCTYPE html>
-<html lang="en">
-<?php $title = $title ?? 'Admin Dashboard — PuihahaTea'; ?>
-<?= $this->include('components/head') ?>
+<?= $this->extend('admin/layout') ?>
 
-<body class="bg-gradient-to-b from-gray-50 via-emerald-50/20 to-gray-50 min-h-dvh text-gray-800">
-    <header class="top-0 z-30 sticky bg-white/80 shadow-sm backdrop-blur">
-        <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <div class="flex justify-between items-center h-16">
-                <a href="/" class="font-serif text-emerald-700 text-2xl">🍃 PuihahaTea</a>
-                <nav class="hidden md:flex items-center gap-6 text-sm">
-                    <a href="/" class="text-emerald-700 hover:text-emerald-900">Site</a>
-                    <a href="/services" class="text-emerald-700 hover:text-emerald-900">Services</a>
-                    <a href="/admin" class="font-semibold text-emerald-900">Dashboard</a>
-                </nav>
-            </div>
+<?= $this->section('content') ?>
+
+<?php if (! empty($success)) : ?>
+    <div class="bg-emerald-50 mb-6 px-4 py-3 border border-emerald-200 rounded-md text-emerald-900/90"><?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?></div>
+<?php endif; ?>
+<?php if (! empty($error)) : ?>
+    <div class="bg-rose-50 mb-6 px-4 py-3 border border-rose-200 rounded-md text-rose-900/90"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+<?php endif; ?>
+
+<h1 class="font-serif text-emerald-900 text-3xl">Dashboard</h1>
+<p class="mt-2 text-emerald-900/70">Overview and controls.</p>
+
+<!-- Summary cards (for Admin and Employees) -->
+<section class="gap-4 grid sm:grid-cols-2 lg:grid-cols-3 mt-6">
+    <div class="bg-white shadow-sm p-5 rounded-xl ring-1 ring-emerald-100">
+        <div class="text-emerald-900/70 text-sm">Daily Sales</div>
+        <div class="mt-1 font-semibold text-emerald-900 text-2xl">₱<?= number_format($dailySales ?? 0, 2) ?></div>
+    </div>
+    <div class="bg-white shadow-sm p-5 rounded-xl ring-1 ring-emerald-100">
+        <div class="text-emerald-900/70 text-sm">Pending Orders</div>
+        <div class="mt-1 font-semibold text-emerald-900 text-2xl"><?= (int)($pendingOrders ?? 0) ?></div>
+    </div>
+    <div class="bg-white shadow-sm p-5 rounded-xl ring-1 ring-emerald-100">
+        <div class="text-emerald-900/70 text-sm">Stock Alerts</div>
+        <div class="mt-1 font-semibold text-emerald-900 text-2xl"><?= (int)($stockAlerts ?? 0) ?></div>
+    </div>
+</section>
+
+<?php
+$session = \Config\Services::session();
+$role = $session->get('employee_type') ?? '';
+$isManager = ($role === 'manager');
+?>
+<?php if (!empty($is_admin) || $isManager) : ?>
+    <!-- Filters -->
+    <form method="get" class="flex flex-wrap items-end gap-3 mt-6">
+        <div class="min-w-56 grow">
+            <label class="block text-emerald-900/80 text-sm">Search</label>
+            <input type="search" name="q" value="<?= htmlspecialchars($filters['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="Search by name or email" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
         </div>
-    </header>
+        <div>
+            <label class="block text-emerald-900/80 text-sm">Status</label>
+            <select name="status" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400">
+                <option value="">All</option>
+                <?php $selStatus = $filters['status'] ?? ''; ?>
+                <option value="active" <?= $selStatus === 'active' ? 'selected' : '' ?>>Active</option>
+                <option value="inactive" <?= $selStatus === 'inactive' ? 'selected' : '' ?>>Inactive</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-emerald-900/80 text-sm">Employee Type</label>
+            <select name="type" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400">
+                <option value="">All</option>
+                <?php $selType = $filters['type'] ?? ''; ?>
+                <option value="staff" <?= $selType === 'staff' ? 'selected' : '' ?>>Staff</option>
+                <option value="manager" <?= $selType === 'manager' ? 'selected' : '' ?>>Manager</option>
+            </select>
+        </div>
+        <div>
+            <button class="px-4 py-2 rounded-md btn-sage">Apply</button>
+        </div>
+    </form>
 
-    <main class="mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl">
-        <?php if (! empty($success)) : ?>
-            <div class="bg-emerald-50 mb-6 px-4 py-3 border border-emerald-200 rounded-md text-emerald-900/90"><?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?></div>
-        <?php endif; ?>
-        <?php if (! empty($error)) : ?>
-            <div class="bg-rose-50 mb-6 px-4 py-3 border border-rose-200 rounded-md text-rose-900/90"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
-        <?php endif; ?>
-
-        <section class="mb-12">
-            <h1 class="font-serif text-emerald-900 text-3xl">Products</h1>
-            <p class="mt-2 text-emerald-900/70">These items power the Services page gallery.</p>
-        </section>
-
-        <!-- Create -->
-        <section class="bg-white shadow-sm mb-10 p-6 rounded-xl ring-1 ring-emerald-100">
-            <h2 class="font-serif text-emerald-900 text-xl">Add Product</h2>
-            <form class="gap-4 grid sm:grid-cols-2 mt-4" method="post" action="/admin/products">
-                <div>
-                    <label class="block font-medium text-emerald-900/80 text-sm">Title</label>
-                    <input name="title" required maxlength="255" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-                </div>
-                <div>
-                    <label class="block font-medium text-emerald-900/80 text-sm">Image URL</label>
-                    <input name="img" maxlength="2048" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block font-medium text-emerald-900/80 text-sm">Description</label>
-                    <textarea name="desc" rows="3" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full"></textarea>
-                </div>
-                <div class="sm:col-span-2">
-                    <button class="bg-emerald-700 hover:bg-emerald-800 px-5 py-2 rounded-md text-white">Create</button>
-                </div>
-            </form>
-        </section>
-
-        <!-- List/Edit/Delete -->
-        <section class="bg-white shadow-sm p-6 rounded-xl ring-1 ring-emerald-100">
-            <h2 class="font-serif text-emerald-900 text-xl">Existing Products</h2>
-            <?php if (! empty($products)) : ?>
-                <div class="gap-6 grid sm:grid-cols-2 lg:grid-cols-3 mt-4">
-                    <?php foreach ($products as $p): ?>
-                        <article class="rounded-xl ring-1 ring-emerald-100 overflow-hidden">
-                            <div class="relative bg-emerald-50 aspect-[4/3] overflow-hidden">
-                                <img src="<?= htmlspecialchars($p['img'] ?? '', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>" class="w-full h-full object-cover" />
-                            </div>
-                            <div class="space-y-3 p-4">
-                                <form method="post" action="/admin/products/<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" class="space-y-3">
-                                    <input type="hidden" name="id" value="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" />
-                                    <div>
-                                        <label class="block font-medium text-emerald-900/80 text-sm">Title</label>
-                                        <input name="title" value="<?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="255" required class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-                                    </div>
-                                    <div>
-                                        <label class="block font-medium text-emerald-900/80 text-sm">Image URL</label>
-                                        <input name="img" value="<?= htmlspecialchars($p['img'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="2048" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-                                    </div>
-                                    <div>
-                                        <label class="block font-medium text-emerald-900/80 text-sm">Description</label>
-                                        <textarea name="desc" rows="3" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full"><?= htmlspecialchars($p['desc'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-                                    </div>
-                                    <div class="flex justify-between items-center gap-3">
-                                        <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-md text-white">Save</button>
-                                    </div>
-                                </form>
-                                <form method="post" action="/admin/products/<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>/delete">
-                                    <button type="submit" class="bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-md text-white" onclick="return confirm('Delete this product?')">Delete</button>
-                                </form>
-                            </div>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p class="mt-4 text-emerald-900/70">No products yet. Create the first one above.</p>
+    <!-- Users table (Admin only) -->
+    <section class="bg-white shadow-sm mt-6 p-4 sm:p-6 rounded-xl ring-1 ring-emerald-100">
+        <div class="flex justify-between items-center">
+            <h2 class="font-serif text-emerald-900 text-xl">Accounts</h2>
+            <?php if (!empty($is_admin)) : ?>
+                <a class="px-4 py-2 btn-border rounded-md" href="/admin/users/create">Add Employee</a>
             <?php endif; ?>
-        </section>
-    </main>
-</body>
+        </div>
+        <div id="usersTableWrap">
+            <?= view('admin/partials/users_table', ['users' => $users, 'pager' => $pager, 'is_admin' => $is_admin]) ?>
+        </div>
+    </section>
+<?php endif; ?>
 
-</html>
+<script>
+    (function() {
+        const wrap = document.getElementById('usersTableWrap');
+        if (!wrap) return;
+
+        const toAjaxUrl = (href) => {
+            try {
+                const url = new URL(href, window.location.origin);
+                url.searchParams.set('ajax', '1');
+                return url.toString();
+            } catch (e) {
+                const hasQ = href.indexOf('?') !== -1;
+                const sep = hasQ ? '&' : '?';
+                return href + sep + 'ajax=1';
+            }
+        };
+
+        const bindPager = () => {
+            wrap.querySelectorAll('nav a[href]').forEach(a => {
+                a.addEventListener('click', function(ev) {
+                    ev.preventDefault();
+                    const href = this.getAttribute('href');
+                    if (!href) return;
+                    const ajaxUrl = toAjaxUrl(href);
+                    fetch(ajaxUrl, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(r => r.text())
+                        .then(html => {
+                            wrap.innerHTML = html;
+                            try {
+                                const clean = new URL(ajaxUrl);
+                                clean.searchParams.delete('ajax');
+                                window.history.pushState({}, '', clean.toString());
+                            } catch (e) {}
+                            bindPager();
+                        })
+                        .catch(() => {});
+                }, {
+                    passive: false
+                });
+            });
+        };
+
+        bindPager();
+    })();
+</script>
+
+<?= $this->endSection() ?>

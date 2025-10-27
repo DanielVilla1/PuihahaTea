@@ -204,5 +204,30 @@
         h5 {
             font-family: 'Playfair Display', Georgia, serif;
         }
+
+        /* Form fields visibility: consistent borders and focus ring */
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        textarea,
+        select {
+            border: 1px solid #CFE6D7;
+            /* sage-light */
+            border-radius: .375rem;
+            padding: .5rem .75rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #8DAA91;
+            /* sage */
+            box-shadow: 0 0 0 3px rgba(141, 170, 145, 0.25);
+        }
     </style>
 </head>
