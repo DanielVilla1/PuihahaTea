@@ -124,7 +124,7 @@
                             <span id="pmStock" class="inline-block px-3 py-1 rounded ring-1 text-sm"></span>
                         </div>
                         <div class="flex flex-wrap gap-3 mt-6">
-                            <a href="/contact" class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-md text-white">
+                            <a id="pmOrderBtn" href="/contact" class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-md text-white">
                                 <span>Order now</span>
                             </a>
                             <button type="button" class="inline-flex items-center gap-2 bg-white hover:bg-emerald-50 px-4 py-2 rounded-md ring-1 ring-emerald-100 text-emerald-900 pmCloseBtn">Close</button>
@@ -160,6 +160,7 @@
         const pmStock = document.getElementById('pmStock');
         const pmClose = document.getElementById('pmClose');
         let lastFocused = null;
+        const pmOrderBtn = document.getElementById('pmOrderBtn');
 
         const open = (data) => {
             pmTitle.textContent = data.title || '';
@@ -174,6 +175,20 @@
             const stock = parseInt(data.stock || '0', 10);
             pmStock.textContent = isNaN(stock) ? '' : (stock > 0 ? `${stock} in stock` : 'Out of stock');
             pmStock.className = 'inline-block px-3 py-1 rounded ring-1 text-sm ' + (stock > 0 ? 'bg-emerald-50 ring-emerald-100 text-emerald-900/80' : 'bg-rose-50 ring-rose-100 text-rose-900/80');
+
+            // Disable Order button when out of stock
+            if (pmOrderBtn) {
+                if (!isNaN(stock) && stock <= 0) {
+                    pmOrderBtn.setAttribute('aria-disabled', 'true');
+                    pmOrderBtn.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed', 'pointer-events-none');
+                    pmOrderBtn.classList.remove('bg-emerald-700', 'hover:bg-emerald-800');
+                } else {
+                    pmOrderBtn.removeAttribute('aria-disabled');
+                    pmOrderBtn.classList.remove('bg-gray-300', 'text-gray-500', 'cursor-not-allowed', 'pointer-events-none');
+                    if (!pmOrderBtn.classList.contains('bg-emerald-700')) pmOrderBtn.classList.add('bg-emerald-700');
+                    if (!pmOrderBtn.classList.contains('hover:bg-emerald-800')) pmOrderBtn.classList.add('hover:bg-emerald-800');
+                }
+            }
 
             lastFocused = document.activeElement;
             modal.classList.remove('hidden');

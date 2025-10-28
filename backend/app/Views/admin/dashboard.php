@@ -35,10 +35,10 @@ $isManager = ($role === 'manager');
 ?>
 <?php if (!empty($is_admin) || $isManager) : ?>
     <!-- Filters -->
-    <form method="get" class="flex flex-wrap items-end gap-3 mt-6">
+    <form method="get" id="userFiltersForm" class="flex flex-wrap items-end gap-3 mt-6">
         <div class="min-w-56 grow">
             <label class="block text-emerald-900/80 text-sm">Search</label>
-            <input type="search" name="q" value="<?= htmlspecialchars($filters['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="Search by name or email" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+            <input type="search" name="q" value="<?= htmlspecialchars($filters['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="Search by name or email" class="mt-1 border border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
         </div>
         <div>
             <label class="block text-emerald-900/80 text-sm">Status</label>
@@ -59,7 +59,11 @@ $isManager = ($role === 'manager');
             </select>
         </div>
         <div>
-            <button class="px-4 py-2 rounded-md btn-sage">Apply</button>
+            <input type="hidden" name="page_users" value="1" />
+            <div class="flex gap-2">
+                <button class="px-4 py-2 rounded-md btn-sage">Apply</button>
+                <button type="button" id="btnClearFilters" class="px-4 py-2 btn-border rounded-md">Clear</button>
+            </div>
         </div>
     </form>
 
@@ -124,6 +128,30 @@ $isManager = ($role === 'manager');
         };
 
         bindPager();
+
+        // Clear filters button: clears search, status and employee type, resets page to 1, and submits form
+        const form = document.getElementById('userFiltersForm');
+        const clearBtn = document.getElementById('btnClearFilters');
+        if (form && clearBtn) {
+            clearBtn.addEventListener('click', function() {
+                const q = form.querySelector('input[name="q"]');
+                const status = form.querySelector('select[name="status"]');
+                const type = form.querySelector('select[name="type"]');
+                const page = form.querySelector('input[name="page_users"]');
+
+                if (q) q.value = '';
+                if (status) status.selectedIndex = 0;
+                if (type) type.selectedIndex = 0;
+                if (page) page.value = '1';
+
+                // Ensure action doesn't preserve stale query params
+                try {
+                    form.setAttribute('action', window.location.pathname);
+                } catch (e) {}
+
+                form.submit();
+            });
+        }
     })();
 </script>
 

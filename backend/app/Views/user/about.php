@@ -60,7 +60,7 @@
                             <p class="mt-2 text-emerald-800/80">We brought PuihahaTea to weddings and community events with pop-up bars and hands-on brewing workshops.</p>
                         </div>
                         <div class="mt-4 md:mt-0 md:pl-10">
-                            <img src="https://i.pinimg.com/736x/ec/78/a4/ec78a483f562cc740754e71a0955842b.jpg" alt="Tea workshop" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
+                            <img src="https://cdn.shopify.com/s/files/1/2216/2983/files/Art_of_Tea_Blending_Event_Nauteas_Fine_Tea_1.jpg?v=1746628568" alt="Tea workshop" class="shadow-sm rounded-xl ring-1 ring-emerald-100 w-full" />
                         </div>
                     </li>
                     <li class="relative md:gap-12 md:grid md:grid-cols-2">

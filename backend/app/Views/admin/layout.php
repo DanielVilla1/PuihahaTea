@@ -32,6 +32,7 @@
 
             <nav class="space-y-1">
                 <a href="/admin" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Dashboard</a>
+                <a href="/admin/profile" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Profile</a>
                 <a href="/admin/products" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Teas</a>
                 <a href="/admin/orders" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Orders</a>
                 <a href="/admin/analytics" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Analytics</a>

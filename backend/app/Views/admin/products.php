@@ -15,35 +15,37 @@ $isManager = $role === 'manager'; ?>
 <h1 class="font-serif text-emerald-900 text-3xl">Products</h1>
 <p class="mt-2 text-emerald-900/70">Tea inventory used on Services page.</p>
 
-<!-- Create -->
-<section class="bg-white shadow-sm mt-6 mb-10 p-6 rounded-xl ring-1 ring-emerald-100">
-    <h2 class="font-serif text-emerald-900 text-xl">Add Product</h2>
-    <form class="gap-4 grid sm:grid-cols-2 mt-4" method="post" action="/admin/products">
-        <div>
-            <label class="block font-medium text-emerald-900/80 text-sm">Title</label>
-            <input name="title" required maxlength="255" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-        </div>
-        <div>
-            <label class="block font-medium text-emerald-900/80 text-sm">Image URL</label>
-            <input name="img" maxlength="2048" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-        </div>
-        <div>
-            <label class="block font-medium text-emerald-900/80 text-sm">Price (₱)</label>
-            <input name="price" type="number" min="0" step="0.01" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-        </div>
-        <div>
-            <label class="block font-medium text-emerald-900/80 text-sm">Stock</label>
-            <input name="stock" type="number" min="0" step="1" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-        </div>
-        <div class="sm:col-span-2">
-            <label class="block font-medium text-emerald-900/80 text-sm">Description</label>
-            <textarea name="desc" rows="3" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full"></textarea>
-        </div>
-        <div class="sm:col-span-2">
-            <button class="bg-emerald-700 hover:bg-emerald-800 px-5 py-2 rounded-md text-white">Create</button>
-        </div>
-    </form>
-</section>
+<!-- Create (restricted to Admin/Manager) -->
+<?php if ($isAdmin || $isManager): ?>
+    <section class="bg-white shadow-sm mt-6 mb-10 p-6 rounded-xl ring-1 ring-emerald-100">
+        <h2 class="font-serif text-emerald-900 text-xl">Add Product</h2>
+        <form class="gap-4 grid sm:grid-cols-2 mt-4" method="post" action="/admin/products">
+            <div>
+                <label class="block font-medium text-emerald-900/80 text-sm">Title</label>
+                <input name="title" required maxlength="255" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+            </div>
+            <div>
+                <label class="block font-medium text-emerald-900/80 text-sm">Image URL</label>
+                <input name="img" maxlength="2048" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+            </div>
+            <div>
+                <label class="block font-medium text-emerald-900/80 text-sm">Price (₱)</label>
+                <input name="price" type="number" min="0" step="0.01" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+            </div>
+            <div>
+                <label class="block font-medium text-emerald-900/80 text-sm">Stock</label>
+                <input name="stock" type="number" min="0" step="1" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block font-medium text-emerald-900/80 text-sm">Description</label>
+                <textarea name="desc" rows="3" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full"></textarea>
+            </div>
+            <div class="sm:col-span-2">
+                <button class="bg-emerald-700 hover:bg-emerald-800 px-5 py-2 rounded-md text-white">Create</button>
+            </div>
+        </form>
+    </section>
+<?php endif; ?>
 
 <!-- List/Edit/Delete -->
 <section class="bg-white shadow-sm p-6 rounded-xl ring-1 ring-emerald-100">
@@ -56,34 +58,61 @@ $isManager = $role === 'manager'; ?>
                         <img src="<?= htmlspecialchars($p['img'] ?? '', ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>" class="w-full h-full object-cover" />
                     </div>
                     <div class="space-y-3 p-4">
-                        <form method="post" action="/admin/products/<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" class="space-y-3">
-                            <input type="hidden" name="id" value="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" />
-                            <div>
-                                <label class="block font-medium text-emerald-900/80 text-sm">Title</label>
-                                <input name="title" value="<?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="255" required class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-                            </div>
-                            <div>
-                                <label class="block font-medium text-emerald-900/80 text-sm">Image URL</label>
-                                <input name="img" value="<?= htmlspecialchars($p['img'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="2048" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
-                            </div>
-                            <div class="gap-3 grid grid-cols-2">
+                        <?php if ($isAdmin || $isManager): ?>
+                            <form method="post" action="/admin/products/<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" class="space-y-3">
+                                <input type="hidden" name="id" value="<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>" />
                                 <div>
-                                    <label class="block font-medium text-emerald-900/80 text-sm">Price (₱)</label>
-                                    <input name="price" type="number" min="0" step="0.01" value="<?= htmlspecialchars($p['price'] ?? '0.00', ENT_QUOTES, 'UTF-8') ?>" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+                                    <label class="block font-medium text-emerald-900/80 text-sm">Title</label>
+                                    <input name="title" value="<?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="255" required class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
                                 </div>
                                 <div>
-                                    <label class="block font-medium text-emerald-900/80 text-sm">Stock</label>
-                                    <input name="stock" type="number" min="0" step="1" value="<?= htmlspecialchars($p['stock'] ?? '0', ENT_QUOTES, 'UTF-8') ?>" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+                                    <label class="block font-medium text-emerald-900/80 text-sm">Image URL</label>
+                                    <input name="img" value="<?= htmlspecialchars($p['img'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="2048" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+                                </div>
+                                <div class="gap-3 grid grid-cols-2">
+                                    <div>
+                                        <label class="block font-medium text-emerald-900/80 text-sm">Price (₱)</label>
+                                        <input name="price" type="number" min="0" step="0.01" value="<?= htmlspecialchars($p['price'] ?? '0.00', ENT_QUOTES, 'UTF-8') ?>" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+                                    </div>
+                                    <div>
+                                        <label class="block font-medium text-emerald-900/80 text-sm">Stock</label>
+                                        <input name="stock" type="number" min="0" step="1" value="<?= htmlspecialchars($p['stock'] ?? '0', ENT_QUOTES, 'UTF-8') ?>" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block font-medium text-emerald-900/80 text-sm">Description</label>
+                                    <textarea name="desc" rows="3" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full"><?php echo htmlspecialchars($p['desc'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+                                </div>
+                                <div class="flex justify-between items-center gap-3">
+                                    <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-md text-white">Save</button>
+                                </div>
+                            </form>
+                        <?php else: ?>
+                            <div class="space-y-2">
+                                <div>
+                                    <div class="font-medium text-emerald-900/80 text-sm">Title</div>
+                                    <div class="mt-1 text-emerald-900"><?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></div>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-emerald-900/80 text-sm">Image URL</div>
+                                    <div class="mt-1 text-emerald-900/80 break-all"><?= htmlspecialchars($p['img'] ?? '', ENT_QUOTES, 'UTF-8') ?></div>
+                                </div>
+                                <div class="gap-3 grid grid-cols-2">
+                                    <div>
+                                        <div class="font-medium text-emerald-900/80 text-sm">Price (₱)</div>
+                                        <div class="mt-1 text-emerald-900"><?= htmlspecialchars($p['price'] ?? '0.00', ENT_QUOTES, 'UTF-8') ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-emerald-900/80 text-sm">Stock</div>
+                                        <div class="mt-1 text-emerald-900"><?= htmlspecialchars($p['stock'] ?? '0', ENT_QUOTES, 'UTF-8') ?></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-emerald-900/80 text-sm">Description</div>
+                                    <div class="mt-1 text-emerald-900/80 whitespace-pre-line"><?= htmlspecialchars($p['desc'] ?? '', ENT_QUOTES, 'UTF-8') ?></div>
                                 </div>
                             </div>
-                            <div>
-                                <label class="block font-medium text-emerald-900/80 text-sm">Description</label>
-                                <textarea name="desc" rows="3" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full"><?= htmlspecialchars($p['desc'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
-                            </div>
-                            <div class="flex justify-between items-center gap-3">
-                                <button type="submit" class="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-md text-white">Save</button>
-                            </div>
-                        </form>
+                        <?php endif; ?>
                         <?php if ($isAdmin || $isManager): ?>
                             <form method="post" action="/admin/products/<?= htmlspecialchars($p['id'], ENT_QUOTES, 'UTF-8') ?>/delete">
                                 <button type="submit" class="bg-rose-600 hover:bg-rose-700 px-4 py-2 rounded-md text-white" onclick="return confirm('Delete this product?')">Delete</button>

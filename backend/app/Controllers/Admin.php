@@ -56,9 +56,12 @@ class Admin extends BaseController
             $builder = $builder->where('employee_type', 'staff');
         }
         if ($q !== '') {
+            // Case-insensitive search across name and email (MySQL compatible)
+            $pattern = '%' . mb_strtolower($q, 'UTF-8') . '%';
+            $db = \Config\Database::connect();
             $builder = $builder->groupStart()
-                ->like('name', $q)
-                ->orLike('email', $q)
+                ->where('LOWER(name) LIKE ' . $db->escape($pattern))
+                ->orWhere('LOWER(email) LIKE ' . $db->escape($pattern))
                 ->groupEnd();
         }
         if ($status) {
@@ -105,6 +108,10 @@ class Admin extends BaseController
         if ($redir = $this->ensureLoggedIn()) {
             return $redir;
         }
+        // Restrict to admin and manager only
+        if (! ($this->isAdmin() || $this->isManager())) {
+            return redirect()->to('/admin')->with('error', 'Not authorized to access products.');
+        }
 
         $products = [];
         $errorMsg = null;
@@ -128,6 +135,10 @@ class Admin extends BaseController
     {
         if ($redir = $this->ensureLoggedIn()) {
             return $redir;
+        }
+        // Only admin/manager can create products
+        if (! ($this->isAdmin() || $this->isManager())) {
+            return redirect()->to('/admin')->with('error', 'Not authorized to create products.');
         }
         $data = $this->request->getPost(['title', 'desc', 'img', 'price', 'stock']);
         $model = new ProductModel();
@@ -164,6 +175,10 @@ class Admin extends BaseController
     {
         if ($redir = $this->ensureLoggedIn()) {
             return $redir;
+        }
+        // Only admin/manager can update products
+        if (! ($this->isAdmin() || $this->isManager())) {
+            return redirect()->to('/admin')->with('error', 'Not authorized to update products.');
         }
         $data = $this->request->getPost(['title', 'desc', 'img', 'price', 'stock']);
         $model = new ProductModel();
@@ -375,12 +390,15 @@ class Admin extends BaseController
             $pager = $model->pager;
         } catch (\Throwable $e) {
         }
+        $session = session();
         return view('admin/orders', [
             'title' => 'Orders',
             'orders' => $orders,
             'pager' => $pager,
             'is_admin' => $this->isAdmin(),
             'is_manager' => $this->isManager(),
+            'success' => $session->getFlashdata('success'),
+            'error' => $session->getFlashdata('error'),
         ]);
     }
 
@@ -470,6 +488,58 @@ class Admin extends BaseController
 
         return redirect()->to('/admin/orders')->with('success', 'Order updated.');
     }
+
+    public function deleteOrder(int $id)
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        if (! ($this->isAdmin() || $this->isManager())) {
+            return redirect()->to('/admin/orders')->with('error', 'Not authorized to delete orders.');
+        }
+
+        $model = new OrderModel();
+        $db    = db_connect();
+        try {
+            $ok = $model->delete($id);
+            $dbError  = $db->error();
+            $affected = $db->affectedRows();
+
+            if (! $ok) {
+                $msg = 'Failed to delete order.';
+                $errs = method_exists($model, 'errors') ? $model->errors() : [];
+                if (is_array($errs) && ! empty($errs)) {
+                    $msg .= ' Validation: ' . json_encode($errs);
+                }
+                if (! empty($dbError['code'])) {
+                    $msg .= ' DB[' . $dbError['code'] . ']: ' . $dbError['message'];
+                }
+                if ($affected === 0) {
+                    $msg .= ' No rows affected. ID=' . $id;
+                }
+                return redirect()->to('/admin/orders')->with('error', $msg);
+            }
+
+            if ($affected === 0) {
+                return redirect()->to('/admin/orders')->with('error', 'No order was deleted. Possibly not found. ID=' . $id);
+            }
+
+            try {
+                $log = new AuditLogModel();
+                $log->insert([
+                    'actor_user_id' => (int) session()->get('user_id'),
+                    'action'        => 'delete',
+                    'entity_type'   => 'order',
+                    'entity_id'     => (int) $id,
+                    'details'       => null,
+                    'created_at'    => date('Y-m-d H:i:s'),
+                ]);
+            } catch (\Throwable $e) {
+            }
+
+            return redirect()->to('/admin/orders')->with('success', 'Order deleted. ID=' . $id);
+        } catch (\Throwable $e) {
+            return redirect()->to('/admin/orders')->with('error', 'Exception: ' . $e->getMessage());
+        }
+    }
     public function analytics(): string|ResponseInterface
     {
         if ($r = $this->ensureLoggedIn()) return $r;
@@ -480,6 +550,31 @@ class Admin extends BaseController
         if ($r = $this->ensureLoggedIn()) return $r;
         if ($a = $this->ensureAdmin()) return $a;
         return view('admin/settings', ['title' => 'Settings']);
+    }
+
+    public function profile(): string|ResponseInterface
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        // Any logged-in employee can view their profile
+        $uid = (int) (session()->get('user_id') ?? 0);
+        $user = null;
+        try {
+            $model = new UserModel();
+            $user = $model->find($uid);
+        } catch (\Throwable $e) {
+        }
+
+        if (! $user) {
+            return redirect()->to('/admin')->with('error', 'Profile not found.');
+        }
+
+        $session = session();
+        return view('admin/profile', [
+            'title' => 'My Profile',
+            'user'  => $user,
+            'success' => $session->getFlashdata('success'),
+            'error'   => $session->getFlashdata('error'),
+        ]);
     }
 
     // Admin-only: create employee account

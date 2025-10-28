@@ -12,6 +12,7 @@ $routes->get('/contact', 'Home::contact');
 
 // Admin dashboard & CRUD for products
 $routes->get('/admin', 'Admin::dashboard');
+$routes->get('/admin/profile', 'Admin::profile');
 $routes->get('/admin/products', 'Admin::products');
 $routes->post('/admin/products', 'Admin::createProduct');
 $routes->post('/admin/products/(:num)', 'Admin::updateProduct/$1');
@@ -36,6 +37,7 @@ $routes->get('/admin/suppliers', 'Admin::suppliers');
 $routes->get('/admin/orders', 'Admin::orders');
 $routes->post('/admin/orders', 'Admin::createOrder');
 $routes->post('/admin/orders/(:num)/status', 'Admin::updateOrderStatus/$1');
+$routes->post('/admin/orders/(:num)/delete', 'Admin::deleteOrder/$1');
 $routes->get('/admin/analytics', 'Admin::analytics');
 $routes->get('/admin/settings', 'Admin::settings');
 $routes->get('/admin/feedback', 'Admin::feedback');
