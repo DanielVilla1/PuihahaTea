@@ -22,6 +22,10 @@
         <input type="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" required />
     </div>
     <div>
+        <label class="block text-emerald-900/80 text-sm">Cellphone</label>
+        <input type="text" name="cellphone" value="<?= htmlspecialchars($user['cellphone'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="e.g., 09171234567" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+    </div>
+    <div>
         <label class="block text-emerald-900/80 text-sm">Employee Type</label>
         <?php $t = $user['employee_type'] ?? 'staff'; ?>
         <select name="employee_type" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full">

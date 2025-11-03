@@ -6,22 +6,7 @@
 
 <body class="bg-gradient-to-b from-emerald-50 via-lime-50 to-amber-50 min-h-dvh text-gray-800">
     <!-- Nav -->
-    <header class="top-0 z-30 sticky bg-white/80 supports-[backdrop-filter]:bg-white/60 shadow-sm backdrop-blur">
-        <div class="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <div class="flex justify-between items-center h-16">
-                <a href="/" class="flex items-center gap-2 font-serif text-emerald-700 text-2xl">
-                    <span>🍃</span>
-                    <span class="tracking-wide">PuihahaTea</span>
-                </a>
-                <nav class="hidden md:flex items-center gap-8 text-base">
-                    <a href="/" class="py-2 text-emerald-700 hover:text-emerald-900">Home</a>
-                    <a href="/services" class="py-2 text-emerald-700 hover:text-emerald-900">Services</a>
-                    <a href="/about" class="py-2 text-emerald-700 hover:text-emerald-900">About</a>
-                    <a href="/contact" class="py-2 font-semibold text-emerald-900">Contact</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <?= $this->include('components/public_nav') ?>
 
     <main class="mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <!-- Page title -->

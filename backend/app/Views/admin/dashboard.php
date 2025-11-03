@@ -37,8 +37,16 @@ $isManager = ($role === 'manager');
     <!-- Filters -->
     <form method="get" id="userFiltersForm" class="flex flex-wrap items-end gap-3 mt-6">
         <div class="min-w-56 grow">
-            <label class="block text-emerald-900/80 text-sm">Search</label>
-            <input type="search" name="q" value="<?= htmlspecialchars($filters['q'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="Search by name or email" class="mt-1 border border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+            <label class="block text-emerald-900/80 text-sm">Name</label>
+            <input type="search" name="name" value="<?= htmlspecialchars($filters['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="e.g., Juan Dela Cruz" class="mt-1 border border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+        </div>
+        <div class="min-w-56 grow">
+            <label class="block text-emerald-900/80 text-sm">Email</label>
+            <input type="search" name="email" value="<?= htmlspecialchars($filters['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="e.g., user@example.com" class="mt-1 border border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+        </div>
+        <div class="min-w-56 grow">
+            <label class="block text-emerald-900/80 text-sm">Cellphone</label>
+            <input type="search" name="cellphone" value="<?= htmlspecialchars($filters['cellphone'] ?? '', ENT_QUOTES, 'UTF-8') ?>" placeholder="e.g., 09171234567" class="mt-1 border border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
         </div>
         <div>
             <label class="block text-emerald-900/80 text-sm">Status</label>
@@ -56,6 +64,15 @@ $isManager = ($role === 'manager');
                 <?php $selType = $filters['type'] ?? ''; ?>
                 <option value="staff" <?= $selType === 'staff' ? 'selected' : '' ?>>Staff</option>
                 <option value="manager" <?= $selType === 'manager' ? 'selected' : '' ?>>Manager</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-emerald-900/80 text-sm">Per page</label>
+            <?php $selPer = (int)($filters['per'] ?? 10); ?>
+            <select name="per" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400">
+                <?php foreach ([10, 20, 50, 100] as $opt): ?>
+                    <option value="<?= $opt ?>" <?= $selPer === $opt ? 'selected' : '' ?>><?= $opt ?></option>
+                <?php endforeach; ?>
             </select>
         </div>
         <div>
@@ -104,7 +121,19 @@ $isManager = ($role === 'manager');
                     ev.preventDefault();
                     const href = this.getAttribute('href');
                     if (!href) return;
-                    const ajaxUrl = toAjaxUrl(href);
+                    // Preserve current filters while changing page
+                    let ajaxUrl = href;
+                    try {
+                        const current = new URL(window.location.href);
+                        const target = new URL(href, window.location.origin);
+                        const targetPage = target.searchParams.get('page_users') || '1';
+                        current.searchParams.set('page_users', targetPage);
+                        // ensure ajax flag
+                        current.searchParams.set('ajax', '1');
+                        ajaxUrl = current.toString();
+                    } catch (e) {
+                        ajaxUrl = toAjaxUrl(href);
+                    }
                     fetch(ajaxUrl, {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest'
@@ -134,12 +163,16 @@ $isManager = ($role === 'manager');
         const clearBtn = document.getElementById('btnClearFilters');
         if (form && clearBtn) {
             clearBtn.addEventListener('click', function() {
-                const q = form.querySelector('input[name="q"]');
+                const name = form.querySelector('input[name="name"]');
+                const email = form.querySelector('input[name="email"]');
+                const cellphone = form.querySelector('input[name="cellphone"]');
                 const status = form.querySelector('select[name="status"]');
                 const type = form.querySelector('select[name="type"]');
                 const page = form.querySelector('input[name="page_users"]');
 
-                if (q) q.value = '';
+                if (name) name.value = '';
+                if (email) email.value = '';
+                if (cellphone) cellphone.value = '';
                 if (status) status.selectedIndex = 0;
                 if (type) type.selectedIndex = 0;
                 if (page) page.value = '1';

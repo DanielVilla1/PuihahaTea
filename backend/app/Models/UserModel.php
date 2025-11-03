@@ -11,7 +11,7 @@ class UserModel extends Model
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $protectFields    = true;
-    protected $allowedFields    = ['name', 'email', 'password_hash', 'employee_type', 'status'];
+    protected $allowedFields    = ['name', 'email', 'password_hash', 'employee_type', 'status', 'cellphone'];
 
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
@@ -26,5 +26,6 @@ class UserModel extends Model
         // The single 'admin' account is created via seeder, not via UI.
         'employee_type' => 'required|in_list[staff,manager]',
         'status'        => 'required|in_list[active,inactive]',
+        'cellphone'     => 'permit_empty|max_length[30]'
     ];
 }

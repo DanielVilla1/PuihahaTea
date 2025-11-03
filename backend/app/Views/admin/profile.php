@@ -35,4 +35,28 @@
     </div>
 </section>
 
+<h2 class="mt-10 font-serif text-emerald-900 text-2xl">Change Password</h2>
+<p class="mt-1 text-emerald-900/70">Update your password below.</p>
+<section class="bg-white shadow-sm mt-4 p-6 rounded-xl ring-1 ring-emerald-100 max-w-xl">
+    <form method="post" action="/admin/profile/password" class="space-y-4">
+        <div>
+            <label class="block text-emerald-900/80 text-sm">Current password</label>
+            <input name="old_password" type="password" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" required>
+        </div>
+        <div>
+            <label class="block text-emerald-900/80 text-sm">New password</label>
+            <input name="new_password" type="password" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" minlength="8" required>
+        </div>
+        <div>
+            <label class="block text-emerald-900/80 text-sm">Confirm new password</label>
+            <input name="confirm_password" type="password" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" minlength="8" required>
+        </div>
+        <div class="pt-2">
+            <button class="px-5 py-2 rounded-md btn-sage" type="submit">Update Password</button>
+        </div>
+    </form>
+    <p class="mt-2 text-emerald-900/60 text-sm">Password must be at least 8 characters.</p>
+
+</section>
+
 <?= $this->endSection() ?>

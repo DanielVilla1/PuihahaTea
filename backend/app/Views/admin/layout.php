@@ -35,6 +35,9 @@
                 <a href="/admin/profile" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Profile</a>
                 <a href="/admin/products" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Teas</a>
                 <a href="/admin/orders" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Orders</a>
+                <?php if ($isAdmin || $role === 'manager'): ?>
+                    <a href="/admin/customers" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Customers</a>
+                <?php endif; ?>
                 <a href="/admin/analytics" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Analytics</a>
                 <a href="/admin/suppliers" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Suppliers</a>
                 <a href="/admin/feedback" class="block hover:bg-emerald-50 px-3 py-2 rounded text-emerald-900">Feedback</a>

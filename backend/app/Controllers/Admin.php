@@ -6,7 +6,12 @@ use App\Models\ProductModel;
 use App\Models\UserModel;
 use App\Models\AuditLogModel;
 use App\Models\OrderModel;
+use App\Models\CustomerModel;
 use CodeIgniter\HTTP\ResponseInterface;
+// import helper functions for static analysis
+use function session;
+use function redirect;
+use function view;
 
 class Admin extends BaseController
 {
@@ -45,9 +50,16 @@ class Admin extends BaseController
         $userModel = new UserModel();
         $role = session()->get('employee_type') ?? '';
 
-        $q      = trim((string) $this->request->getGet('q'));
+        $nameQ  = trim((string) $this->request->getGet('name'));
+        $emailQ = trim((string) $this->request->getGet('email'));
+        $cellQ  = trim((string) $this->request->getGet('cellphone'));
         $status = $this->request->getGet('status');
         $type   = $this->request->getGet('type');
+        $per    = (int) $this->request->getGet('per');
+        $allowedPer = [10, 20, 50, 100];
+        if (! in_array($per, $allowedPer, true)) {
+            $per = 10;
+        }
 
         // Exclude the single admin account from editable listing
         $builder = $userModel->where('employee_type !=', 'admin');
@@ -55,14 +67,18 @@ class Admin extends BaseController
         if ($role === 'manager') {
             $builder = $builder->where('employee_type', 'staff');
         }
-        if ($q !== '') {
-            // Case-insensitive search across name and email (MySQL compatible)
-            $pattern = '%' . mb_strtolower($q, 'UTF-8') . '%';
-            $db = \Config\Database::connect();
-            $builder = $builder->groupStart()
-                ->where('LOWER(name) LIKE ' . $db->escape($pattern))
-                ->orWhere('LOWER(email) LIKE ' . $db->escape($pattern))
-                ->groupEnd();
+        $db = \Config\Database::connect();
+        if ($nameQ !== '') {
+            $pattern = '%' . mb_strtolower($nameQ, 'UTF-8') . '%';
+            $builder = $builder->where('LOWER(name) LIKE ' . $db->escape($pattern));
+        }
+        if ($emailQ !== '') {
+            $pattern = '%' . mb_strtolower($emailQ, 'UTF-8') . '%';
+            $builder = $builder->where('LOWER(email) LIKE ' . $db->escape($pattern));
+        }
+        if ($cellQ !== '') {
+            $pattern = '%' . mb_strtolower($cellQ, 'UTF-8') . '%';
+            $builder = $builder->where('LOWER(cellphone) LIKE ' . $db->escape($pattern));
         }
         if ($status) {
             $builder = $builder->where('status', $status);
@@ -71,7 +87,7 @@ class Admin extends BaseController
             $builder = $builder->where('employee_type', $type);
         }
 
-        $users = $builder->orderBy('id', 'desc')->paginate(10, 'users');
+        $users = $builder->orderBy('id', 'desc')->paginate($per, 'users');
         $pager = $userModel->pager;
 
         // Simple placeholders for employee dashboard summaries
@@ -84,7 +100,14 @@ class Admin extends BaseController
             'title'   => 'Admin Dashboard',
             'users'   => $users,
             'pager'   => $pager,
-            'filters' => ['q' => $q, 'status' => $status, 'type' => $type],
+            'filters' => [
+                'name' => $nameQ,
+                'email' => $emailQ,
+                'cellphone' => $cellQ,
+                'status' => $status,
+                'type' => $type,
+                'per' => $per,
+            ],
             'is_admin' => $this->isAdmin(),
             'is_manager' => $this->isManager(),
             'dailySales' => $dailySales,
@@ -268,7 +291,7 @@ class Admin extends BaseController
             return $redir;
         }
         if ($a = $this->ensureAdmin()) return $a;
-        $data = $this->request->getPost(['name', 'email', 'employee_type', 'status']);
+        $data = $this->request->getPost(['name', 'email', 'cellphone', 'employee_type', 'status']);
         $model = new UserModel();
         // Prevent setting any user to admin via UI
         if (($data['employee_type'] ?? '') === 'admin') {
@@ -277,6 +300,7 @@ class Admin extends BaseController
         if (! $model->update($id, [
             'name'          => trim((string) ($data['name'] ?? '')),
             'email'         => trim((string) ($data['email'] ?? '')),
+            'cellphone'     => trim((string) ($data['cellphone'] ?? '')) ?: null,
             'employee_type' => (string) ($data['employee_type'] ?? 'staff'),
             'status'        => (string) ($data['status'] ?? 'active'),
         ])) {
@@ -400,6 +424,180 @@ class Admin extends BaseController
             'success' => $session->getFlashdata('success'),
             'error' => $session->getFlashdata('error'),
         ]);
+    }
+
+    // Customers dashboard
+    public function customers(): string|ResponseInterface
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        // Only admin & manager can access customers; staff restricted
+        if (! ($this->isAdmin() || $this->isManager())) {
+            return redirect()->to('/admin')->with('error', 'Not authorized to access customers.');
+        }
+
+        $customers = [];
+        $pager = null;
+        // Filters
+        $account = trim((string) $this->request->getGet('account'));
+        $nameQ   = trim((string) $this->request->getGet('name'));
+        $emailQ  = trim((string) $this->request->getGet('email'));
+        $cellQ   = trim((string) $this->request->getGet('cellphone'));
+        $status  = $this->request->getGet('status'); // regular|vip|guest
+        $verifiedSel = $this->request->getGet('verified'); // verified|pending|all
+        if (! in_array((string) $verifiedSel, ['verified', 'pending', 'all'], true)) {
+            $verifiedSel = 'verified'; // default: only verified accounts
+        }
+        $per     = (int) $this->request->getGet('per');
+        $allowedPer = [10, 20, 50, 100];
+        if (! in_array($per, $allowedPer, true)) {
+            $per = 10;
+        }
+
+        try {
+            $model = new CustomerModel();
+            $builder = $model; // model is queryable
+            $db = \Config\Database::connect();
+            if ($account !== '') {
+                $pattern = '%' . mb_strtolower($account, 'UTF-8') . '%';
+                $builder = $builder->where('LOWER(account_number) LIKE ' . $db->escape($pattern));
+            }
+            if ($nameQ !== '') {
+                $pattern = '%' . mb_strtolower($nameQ, 'UTF-8') . '%';
+                $builder = $builder->where('LOWER(name) LIKE ' . $db->escape($pattern));
+            }
+            if ($emailQ !== '') {
+                $pattern = '%' . mb_strtolower($emailQ, 'UTF-8') . '%';
+                $builder = $builder->where('LOWER(email) LIKE ' . $db->escape($pattern));
+            }
+            if ($cellQ !== '') {
+                $pattern = '%' . mb_strtolower($cellQ, 'UTF-8') . '%';
+                $builder = $builder->where('LOWER(cellphone) LIKE ' . $db->escape($pattern));
+            }
+            if (in_array((string) $status, ['regular', 'vip', 'guest'], true)) {
+                $builder = $builder->where('status', $status);
+            }
+            // Apply verification visibility
+            if ($verifiedSel === 'verified') {
+                $builder = $builder->where('verified_at IS NOT NULL', null, false);
+            } elseif ($verifiedSel === 'pending') {
+                $builder = $builder->where('verified_at IS NULL', null, false);
+            } // 'all' = no filter
+
+            // Show newest by creation time; tie-breaker by id
+            $customers = $builder->orderBy('created_at', 'desc')->orderBy('id', 'desc')->paginate($per, 'customers');
+            $pager = $model->pager;
+        } catch (\Throwable $e) {
+        }
+        $session = session();
+        return view('admin/customers', [
+            'title' => 'Customers',
+            'customers' => $customers,
+            'pager' => $pager,
+            'is_admin' => $this->isAdmin(),
+            'is_manager' => $this->isManager(),
+            'filters' => [
+                'account' => $account,
+                'name' => $nameQ,
+                'email' => $emailQ,
+                'cellphone' => $cellQ,
+                'status' => $status,
+                'verified' => $verifiedSel,
+                'per' => $per,
+            ],
+            'success' => $session->getFlashdata('success'),
+            'error' => $session->getFlashdata('error'),
+        ]);
+    }
+
+    public function createCustomerForm(): string|ResponseInterface
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        if (! $this->isAdmin()) {
+            return redirect()->to('/admin/customers')->with('error', 'Not authorized.');
+        }
+        $session = session();
+        return view('admin/customer_create', [
+            'title' => 'Add Customer',
+            'success' => $session->getFlashdata('success'),
+            'error' => $session->getFlashdata('error'),
+        ]);
+    }
+
+    public function storeCustomer()
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        if (! $this->isAdmin()) {
+            return redirect()->to('/admin/customers')->with('error', 'Not authorized.');
+        }
+        $data = $this->request->getPost(['account_number', 'name', 'address', 'email', 'cellphone', 'status']);
+        $model = new CustomerModel();
+        $ok = $model->insert([
+            'account_number' => trim((string) ($data['account_number'] ?? '')),
+            'name'           => trim((string) ($data['name'] ?? '')),
+            'address'        => trim((string) ($data['address'] ?? '')) ?: null,
+            'email'          => trim((string) ($data['email'] ?? '')),
+            'cellphone'      => trim((string) ($data['cellphone'] ?? '')) ?: null,
+            'status'         => in_array(($data['status'] ?? 'regular'), ['regular', 'vip', 'guest'], true) ? $data['status'] : 'regular',
+        ], true);
+        if (! $ok) {
+            return redirect()->to('/admin/customers/create')->with('error', 'Failed to add customer.');
+        }
+        return redirect()->to('/admin/customers')->with('success', 'Customer added.');
+    }
+
+    public function editCustomerForm(int $id): string|ResponseInterface
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        if (! $this->isAdmin()) {
+            return redirect()->to('/admin/customers')->with('error', 'Not authorized.');
+        }
+        $model = new CustomerModel();
+        $customer = $model->find($id);
+        if (! $customer) {
+            return redirect()->to('/admin/customers')->with('error', 'Customer not found.');
+        }
+        $session = session();
+        return view('admin/customer_edit', [
+            'title' => 'Edit Customer',
+            'customer' => $customer,
+            'success' => $session->getFlashdata('success'),
+            'error' => $session->getFlashdata('error'),
+        ]);
+    }
+
+    public function updateCustomer(int $id)
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        if (! $this->isAdmin()) {
+            return redirect()->to('/admin/customers')->with('error', 'Not authorized.');
+        }
+        $data = $this->request->getPost(['account_number', 'name', 'address', 'email', 'cellphone', 'status']);
+        $model = new CustomerModel();
+        $ok = $model->update($id, [
+            'account_number' => trim((string) ($data['account_number'] ?? '')),
+            'name'           => trim((string) ($data['name'] ?? '')),
+            'address'        => trim((string) ($data['address'] ?? '')) ?: null,
+            'email'          => trim((string) ($data['email'] ?? '')),
+            'cellphone'      => trim((string) ($data['cellphone'] ?? '')) ?: null,
+            'status'         => in_array(($data['status'] ?? 'regular'), ['regular', 'vip', 'guest'], true) ? $data['status'] : 'regular',
+        ]);
+        if (! $ok) {
+            return redirect()->to('/admin/customers/' . $id . '/edit')->with('error', 'Failed to update customer.');
+        }
+        return redirect()->to('/admin/customers')->with('success', 'Customer updated.');
+    }
+
+    public function deleteCustomer(int $id)
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        if (! $this->isAdmin()) {
+            return redirect()->to('/admin/customers')->with('error', 'Not authorized.');
+        }
+        $model = new CustomerModel();
+        if (! $model->delete($id)) {
+            return redirect()->to('/admin/customers')->with('error', 'Failed to delete customer.');
+        }
+        return redirect()->to('/admin/customers')->with('success', 'Customer deleted.');
     }
 
     public function createOrder()
@@ -577,6 +775,48 @@ class Admin extends BaseController
         ]);
     }
 
+    // Employee self-service: change own password
+    public function changePassword()
+    {
+        if ($r = $this->ensureLoggedIn()) return $r;
+        $uid = (int) (session()->get('user_id') ?? 0);
+        if ($uid <= 0) {
+            return redirect()->to('/admin/login');
+        }
+
+        $old = (string) $this->request->getPost('old_password');
+        $new = (string) $this->request->getPost('new_password');
+        $conf = (string) $this->request->getPost('confirm_password');
+
+        if ($old === '' || $new === '' || $conf === '') {
+            return redirect()->to('/admin/profile')->with('error', 'All fields are required.');
+        }
+        if ($new !== $conf) {
+            return redirect()->to('/admin/profile')->with('error', 'New password and confirmation do not match.');
+        }
+        if (strlen($new) < 8) {
+            return redirect()->to('/admin/profile')->with('error', 'New password must be at least 8 characters.');
+        }
+
+        $model = new UserModel();
+        $user = $model->find($uid);
+        if (! $user) {
+            return redirect()->to('/admin/profile')->with('error', 'User not found.');
+        }
+        if (! password_verify($old, (string) ($user['password_hash'] ?? ''))) {
+            return redirect()->to('/admin/profile')->with('error', 'Your current password is incorrect.');
+        }
+
+        $ok = $model->update($uid, [
+            'password_hash' => password_hash($new, PASSWORD_BCRYPT),
+        ]);
+        if (! $ok) {
+            return redirect()->to('/admin/profile')->with('error', 'Unable to update password right now.');
+        }
+
+        return redirect()->to('/admin/profile')->with('success', 'Password updated successfully.');
+    }
+
     // Admin-only: create employee account
     public function createUserForm(): ResponseInterface|string
     {
@@ -599,9 +839,10 @@ class Admin extends BaseController
         }
         if ($a = $this->ensureAdmin()) return $a;
 
-        $data = $this->request->getPost(['name', 'email', 'password', 'employee_type', 'status']);
+        $data = $this->request->getPost(['name', 'email', 'cellphone', 'password', 'employee_type', 'status']);
         $name  = trim((string) ($data['name'] ?? ''));
         $email = trim((string) ($data['email'] ?? ''));
+        $cell  = trim((string) ($data['cellphone'] ?? ''));
         $pass  = (string) ($data['password'] ?? '');
         $type  = (string) ($data['employee_type'] ?? 'staff');
         $stat  = (string) ($data['status'] ?? 'active');
@@ -618,6 +859,7 @@ class Admin extends BaseController
         $ok = $model->insert([
             'name'          => $name,
             'email'         => $email,
+            'cellphone'     => $cell !== '' ? $cell : null,
             'password_hash' => password_hash($pass, PASSWORD_BCRYPT),
             'employee_type' => in_array($type, ['staff', 'manager'], true) ? $type : 'staff',
             'status'        => in_array($stat, ['active', 'inactive'], true) ? $stat : 'active',

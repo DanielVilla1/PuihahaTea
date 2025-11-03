@@ -22,6 +22,10 @@
         <input type="email" name="email" required class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
     </div>
     <div>
+        <label class="block text-emerald-900/80 text-sm">Cellphone</label>
+        <input type="text" name="cellphone" placeholder="e.g., 09171234567" class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
+    </div>
+    <div>
         <label class="block text-emerald-900/80 text-sm">Temporary Password</label>
         <input type="password" name="password" required class="mt-1 border-emerald-200 focus:border-emerald-400 rounded-md focus:ring-emerald-400 w-full" />
         <p class="mt-1 text-emerald-900/70 text-xs">Share this password with the employee; they can change it later.</p>

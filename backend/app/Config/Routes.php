@@ -10,9 +10,28 @@ $routes->get('/services', 'Home::services');
 $routes->get('/about', 'Home::about');
 $routes->get('/contact', 'Home::contact');
 
+// Public user auth (customer-facing)
+$routes->get('/login', 'UserAuth::login');
+$routes->post('/login', 'UserAuth::doLogin');
+$routes->get('/register', 'UserAuth::register');
+$routes->post('/register', 'UserAuth::doRegister');
+// Email verification (code-based; no direct links in email)
+$routes->get('/verify', 'UserAuth::verifyForm');
+$routes->post('/verify', 'UserAuth::verifySubmit');
+// Back-compat: token in URL still accepted but not used in emails
+$routes->get('/verify/(:segment)', 'UserAuth::verify/$1');
+
+// Customer account & session
+$routes->get('/logout', 'UserAuth::logout');
+$routes->get('/account', 'Account::index');
+$routes->post('/account', 'Account::update');
+// Customer change password
+$routes->post('/account/password', 'Account::changePassword');
+
 // Admin dashboard & CRUD for products
 $routes->get('/admin', 'Admin::dashboard');
 $routes->get('/admin/profile', 'Admin::profile');
+$routes->post('/admin/profile/password', 'Admin::changePassword');
 $routes->get('/admin/products', 'Admin::products');
 $routes->post('/admin/products', 'Admin::createProduct');
 $routes->post('/admin/products/(:num)', 'Admin::updateProduct/$1');
@@ -41,3 +60,11 @@ $routes->post('/admin/orders/(:num)/delete', 'Admin::deleteOrder/$1');
 $routes->get('/admin/analytics', 'Admin::analytics');
 $routes->get('/admin/settings', 'Admin::settings');
 $routes->get('/admin/feedback', 'Admin::feedback');
+
+// Customers dashboard (admin editable, manager view-only)
+$routes->get('/admin/customers', 'Admin::customers');
+$routes->get('/admin/customers/create', 'Admin::createCustomerForm');
+$routes->post('/admin/customers', 'Admin::storeCustomer');
+$routes->get('/admin/customers/(:num)/edit', 'Admin::editCustomerForm/$1');
+$routes->post('/admin/customers/(:num)', 'Admin::updateCustomer/$1');
+$routes->post('/admin/customers/(:num)/delete', 'Admin::deleteCustomer/$1');

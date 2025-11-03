@@ -29,6 +29,7 @@ class AdminSeeder extends Seeder
             // Ensure the account is admin and active; update password to known value
             $builder->where('id', $existing['id'])->update([
                 'name'          => $name,
+                'cellphone'     => $existing['cellphone'] ?? '09170000000',
                 'password_hash' => $hash,
                 'employee_type' => 'admin',
                 'status'        => 'active',
@@ -38,6 +39,7 @@ class AdminSeeder extends Seeder
             $builder->insert([
                 'name'          => $name,
                 'email'         => $email,
+                'cellphone'     => '09170000000',
                 'password_hash' => $hash,
                 'employee_type' => 'admin',
                 'status'        => 'active',
