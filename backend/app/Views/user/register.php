@@ -9,7 +9,7 @@
     <main class="relative flex-1 place-items-center grid px-4" style="min-height:calc(100dvh - 64px);">
         <!-- Tropical background -->
         <div aria-hidden="true" class="-z-10 absolute inset-0">
-            <div class="absolute inset-0" style="background-image:url('https://media.craiyon.com/2025-07-16/GraajxwBTj2vdmryvA9Ueg.webp'); background-size:cover; background-position:center;"></div>
+            <div class="absolute inset-0" style="background-image:url('https://wallpapers-clan.com/wp-content/uploads/2025/03/tropical-beach-sunset-with-pink-sky-desktop-wallpaper-preview.jpg'); background-size:cover; background-position:center;"></div>
             <div class="absolute inset-0 bg-gradient-to-b from-emerald-900/40 via-emerald-800/30 to-amber-700/30"></div>
         </div>
         <div class="w-full max-w-2xl">
