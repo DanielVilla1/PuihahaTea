@@ -83,6 +83,19 @@ class UserAuth extends BaseController
             'customer_email' => (string) ($customer['email'] ?? ''),
             'customer_status' => (string) (isset($customer['status']) && $customer['status'] !== '' ? $customer['status'] : 'regular'),
         ]);
+
+        // Merge guest cart if present
+        $guestId = (int) (session()->get('guest_customer_id') ?? 0);
+        if ($guestId > 0 && $guestId !== (int) $customer['id']) {
+            try {
+                $cartSvc = \Config\Services::cartService();
+                $cartSvc->mergeGuestCart($guestId, (int) $customer['id']);
+                // Clear guest id so future operations use real customer id only
+                session()->remove('guest_customer_id');
+            } catch (\Throwable $e) {
+                // swallow errors; cart merge failure should not block login
+            }
+        }
         return redirect()->to('/')->with('success', 'Signed in successfully.');
     }
 

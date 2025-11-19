@@ -13,7 +13,7 @@ class ProductModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     // Fillable fields
-    protected $allowedFields    = ['title', 'desc', 'img', 'price', 'stock'];
+    protected $allowedFields    = ['title', 'desc', 'img', 'price', 'stock', 'category'];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -36,6 +36,7 @@ class ProductModel extends Model
         'img'   => 'permit_empty|max_length[2048]',
         'price' => 'permit_empty|decimal',
         'stock' => 'permit_empty|is_natural',
+        'category' => 'permit_empty|in_list[tea,coffee,sandwich]',
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;

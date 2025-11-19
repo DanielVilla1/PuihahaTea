@@ -6,6 +6,13 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
+
+// Cart routes (customer session required via Auth/User or custom filter later)
+$routes->get('/cart', 'Cart::index');
+$routes->post('/cart/add', 'Cart::add');
+$routes->post('/cart/item/(:num)/update', 'Cart::update/$1');
+$routes->post('/cart/item/(:num)/remove', 'Cart::remove/$1');
+$routes->post('/cart/checkout', 'Cart::checkout');
 $routes->get('/services', 'Home::services');
 $routes->get('/about', 'Home::about');
 $routes->get('/contact', 'Home::contact');

@@ -137,10 +137,33 @@ class Admin extends BaseController
         }
 
         $products = [];
+        $pager = null;
         $errorMsg = null;
+
+        // Filters (search + type + per)
+        $q    = trim((string) $this->request->getGet('q'));
+        $type = (string) $this->request->getGet('type'); // '', tea, coffee, sandwich
+        $per  = (int) $this->request->getGet('per');
+        $allowedPer = [10, 20, 50, 100];
+        if (! in_array($per, $allowedPer, true)) {
+            $per = 10; // default per-page
+        }
+
         try {
             $model = new ProductModel();
-            $products = $model->orderBy('id', 'desc')->findAll();
+            if ($q !== '') {
+                $model = $model->groupStart()
+                    ->like('title', $q)
+                    ->orLike('desc', $q)
+                    ->groupEnd();
+            }
+            // Direct category filtering instead of LIKE matching; relies on explicit category assignment
+            $t = strtolower($type);
+            if (in_array($t, ['tea', 'coffee', 'sandwich'], true)) {
+                $model = $model->where('category', $t);
+            }
+            $products = $model->orderBy('id', 'DESC')->paginate($per, 'products');
+            $pager = $model->pager;
         } catch (\Throwable $e) {
             $errorMsg = 'Database unavailable. Showing empty list. ' . $e->getMessage();
         }
@@ -149,6 +172,12 @@ class Admin extends BaseController
         return view('admin/products', [
             'title'    => 'Manage Products',
             'products' => $products,
+            'pager'    => $pager,
+            'filters'  => [
+                'q' => $q,
+                'type' => $type,
+                'per' => $per,
+            ],
             'success'  => $session->getFlashdata('success'),
             'error'    => $session->getFlashdata('error') ?? $errorMsg,
         ]);
@@ -163,8 +192,14 @@ class Admin extends BaseController
         if (! ($this->isAdmin() || $this->isManager())) {
             return redirect()->to('/admin')->with('error', 'Not authorized to create products.');
         }
-        $data = $this->request->getPost(['title', 'desc', 'img', 'price', 'stock']);
+        $data = $this->request->getPost(['title', 'desc', 'img', 'price', 'stock', 'category']);
         $model = new ProductModel();
+
+        $allowedCategories = ['tea', 'coffee', 'sandwich'];
+        $category = strtolower(trim((string) ($data['category'] ?? '')));
+        if (! in_array($category, $allowedCategories, true)) {
+            $category = null; // silently ignore invalid category
+        }
 
         if (! $model->save([
             'title' => trim((string) ($data['title'] ?? '')),
@@ -172,6 +207,7 @@ class Admin extends BaseController
             'img'   => (string) ($data['img'] ?? ''),
             'price' => (string) ($data['price'] ?? '0.00'),
             'stock' => (int) ($data['stock'] ?? 0),
+            'category' => $category,
         ])) {
             return redirect()->to('/admin/products')->with('error', 'Failed to create product.');
         }
@@ -203,8 +239,14 @@ class Admin extends BaseController
         if (! ($this->isAdmin() || $this->isManager())) {
             return redirect()->to('/admin')->with('error', 'Not authorized to update products.');
         }
-        $data = $this->request->getPost(['title', 'desc', 'img', 'price', 'stock']);
+        $data = $this->request->getPost(['title', 'desc', 'img', 'price', 'stock', 'category']);
         $model = new ProductModel();
+
+        $allowedCategories = ['tea', 'coffee', 'sandwich'];
+        $category = strtolower(trim((string) ($data['category'] ?? '')));
+        if (! in_array($category, $allowedCategories, true)) {
+            $category = null; // keep null if invalid
+        }
 
         if (! $model->update($id, [
             'title' => trim((string) ($data['title'] ?? '')),
@@ -212,6 +254,7 @@ class Admin extends BaseController
             'img'   => (string) ($data['img'] ?? ''),
             'price' => (string) ($data['price'] ?? '0.00'),
             'stock' => (int) ($data['stock'] ?? 0),
+            'category' => $category,
         ])) {
             return redirect()->to('/admin/products')->with('error', 'Failed to update product.');
         }
