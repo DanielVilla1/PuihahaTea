@@ -103,7 +103,7 @@ class Cart extends BaseController
         $method = (string) $this->request->getPost('method');
         // Collect method-specific fields
         $meta = [];
-        if (in_array($method, ['credit','debit'], true)) {
+        if (in_array($method, ['credit', 'debit'], true)) {
             $meta['card_holder'] = (string) $this->request->getPost('card_holder');
             $meta['card_last4']  = (string) $this->request->getPost('card_last4');
         } elseif ($method === 'ebank') {

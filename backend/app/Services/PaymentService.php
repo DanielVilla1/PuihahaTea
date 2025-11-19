@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 class PaymentService
@@ -13,7 +14,7 @@ class PaymentService
             return ['ok' => false, 'error' => 'Invalid customer'];
         }
         $method = strtolower(trim($method));
-        if (! in_array($method, ['credit','debit','ebank'], true)) {
+        if (! in_array($method, ['credit', 'debit', 'ebank'], true)) {
             return ['ok' => false, 'error' => 'Unsupported method'];
         }
         // Basic normalization
@@ -21,8 +22,8 @@ class PaymentService
         switch ($method) {
             case 'credit':
             case 'debit':
-                $holder = trim((string) ($data['card_holder'] ?? ''));   
-                $last4  = preg_replace('/[^0-9]/','', (string) ($data['card_last4'] ?? ''));
+                $holder = trim((string) ($data['card_holder'] ?? ''));
+                $last4  = preg_replace('/[^0-9]/', '', (string) ($data['card_last4'] ?? ''));
                 $last4  = substr($last4, -4);
                 if ($holder === '' || strlen($last4) !== 4) {
                     return ['ok' => false, 'error' => 'Card details incomplete'];
@@ -38,7 +39,7 @@ class PaymentService
                 $clean = ['bank_name' => $bank, 'bank_ref' => $ref];
                 break;
         }
-        $reference = strtoupper($method) . '-' . substr(sha1(json_encode([$customerId,$method,$clean, microtime(true)])),0,12);
+        $reference = strtoupper($method) . '-' . substr(sha1(json_encode([$customerId, $method, $clean, microtime(true)])), 0, 12);
         return [
             'ok' => true,
             'reference' => $reference,

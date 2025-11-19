@@ -64,14 +64,14 @@ if ($cstatus === 'vip') {
                     $cartCount = 0;
                 }
                 ?>
-                <a href="/cart" class="relative inline-flex items-center py-2 text-emerald-700 hover:text-emerald-900" title="View Cart">
+                <a href="/cart" class="inline-flex relative items-center py-2 text-emerald-700 hover:text-emerald-900" title="View Cart">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="9" cy="21" r="1" />
                         <circle cx="20" cy="21" r="1" />
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
                     </svg>
                     <?php if ($cartCount > 0): ?>
-                        <span class="absolute -top-1 -right-2 bg-rose-600 text-white text-xs font-semibold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center" aria-label="Cart items"><?= $cartCount ?></span>
+                        <span class="-top-1 -right-2 absolute bg-rose-600 px-1.5 py-0.5 rounded-full min-w-[1.25rem] font-semibold text-white text-xs text-center" aria-label="Cart items"><?= $cartCount ?></span>
                     <?php endif; ?>
                 </a>
                 <?php if ($cid > 0): ?>

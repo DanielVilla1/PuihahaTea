@@ -20,13 +20,20 @@
             <h2 class="font-serif text-emerald-900 text-2xl sm:text-3xl">Product Gallery</h2>
             <p class="mt-2 text-emerald-800/80">Signature blends inspired by island botany.</p>
             <?php if ($success = session()->getFlashdata('success')): ?>
-                <div class="bg-emerald-50 border border-emerald-200 rounded-md px-4 py-2 mt-6 text-emerald-800 flex items-center gap-2" role="alert">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+                <div class="flex items-center gap-2 bg-emerald-50 mt-6 px-4 py-2 border border-emerald-200 rounded-md text-emerald-800" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
                     <span><?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
             <?php elseif ($error = session()->getFlashdata('error')): ?>
-                <div class="bg-rose-50 border border-rose-200 rounded-md px-4 py-2 mt-6 text-rose-800 flex items-center gap-2" role="alert">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                <div class="flex items-center gap-2 bg-rose-50 mt-6 px-4 py-2 border border-rose-200 rounded-md text-rose-800" role="alert">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" />
+                        <path d="M12 8v4" />
+                        <path d="M12 16h.01" />
+                    </svg>
                     <span><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></span>
                 </div>
             <?php endif; ?>
@@ -66,7 +73,7 @@
                                             <?= csrf_field() ?>
                                             <button
                                                 type="submit"
-                                                class="bg-emerald-700 hover:bg-emerald-800 px-4 py-2 rounded-md text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                                class="bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 px-4 py-2 rounded-md text-white disabled:cursor-not-allowed"
                                                 <?php if ($stock <= 0): ?>disabled<?php endif; ?>>Add to Cart</button>
                                         </form>
                                         <button
